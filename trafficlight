@@ -1,0 +1,79 @@
+module traffic_light_controller(clk,rst,light);
+    input clk,rst;
+    output reg [2:0] light;
+
+
+parameter RED    = 3'b100;
+parameter YELLOW = 3'b010;
+parameter GREEN  = 3'b001;
+
+reg [1:0] state;
+reg [3:0] count;
+
+parameter S_RED    = 2'b00;
+parameter S_GREEN  = 2'b01;
+parameter S_YELLOW = 2'b10;
+
+always @(posedge clk or posedge rst)
+begin
+    if (rst)
+    begin
+        state <= S_RED;
+        count <= 0;
+    end
+    else
+    begin
+        case(state)
+            S_RED:
+            begin
+                if (count == 4)
+                begin
+                    state <= S_GREEN;
+                    count <= 0;
+                end
+                else
+                    count <= count + 1;
+            end
+
+            S_GREEN:
+            begin
+                if (count == 4)
+                begin
+                    state <= S_YELLOW;
+                    count <= 0;
+                end
+                else
+                    count <= count + 1;
+            end
+
+            S_YELLOW:
+            begin
+                if (count == 2)
+                begin
+                    state <= S_RED;
+                    count <= 0;
+                end
+                else
+                    count <= count + 1;
+            end
+
+            default:
+            begin
+                state <= S_RED;
+                count <= 0;
+            end
+        endcase
+    end
+end
+
+always @(*)
+begin
+    case(state)
+        S_RED:    light = RED;
+        S_GREEN:  light = GREEN;
+        S_YELLOW: light = YELLOW;
+        default:  light = RED;
+    endcase
+end
+
+endmodule
